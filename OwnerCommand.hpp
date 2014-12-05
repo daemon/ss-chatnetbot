@@ -17,7 +17,7 @@ class OwnerCommand : public Command
 public:
   OwnerCommand(const std::string& ownerName) : Command(OWNER_COMMAND_NAME, OWNER_COMMAND_DOC), _owner(ownerName) {}
 private:
-  virtual void _onMessage(std::shared_ptr<Player> player, const Message& message);
+  virtual void _onMessage(Player* player, const Message& message);
   std::string _owner;
 };
 

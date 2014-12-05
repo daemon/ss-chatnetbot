@@ -1,5 +1,6 @@
 #include <cassert>
 #include <cstring>
+#include <iostream>
 #include <memory>
 #include <utility>
 #include <ws2tcpip.h>
@@ -24,7 +25,7 @@ ReturnType ChatnetConnection::connect(const Zone& zone)
   int rv = getaddrinfo(zone.ip.c_str(), zone.port.c_str(), &hints, &result);
   assert(rv == 0);
 
-  int rv2 = ::connect(this->_sockfd, result->ai_addr, sizeof(result->ai_addr));
+  int rv2 = ::connect(this->_sockfd, result->ai_addr, sizeof(*result->ai_addr));
   
   ReturnType retCode;
   if (rv2 == 0)
@@ -69,8 +70,8 @@ bool ChatnetConnection::send(const Message& message)
   strcpy_s(buf, len - 1, msg);
   buf[len - 1] = '\n'; 
 
-  int ret = ::send(this->_sockfd, message.getRawMessage().c_str(), len, 0);
-  delete buf;
+  int ret = ::send(this->_sockfd, message.getRawMessage().c_str(), len - 1, 0);
+  delete[] buf;
   return ret != SOCKET_ERROR;
 }
 
@@ -93,26 +94,31 @@ ReturnType ChatnetConnection::listen(std::list<Message>& msgs, unsigned long blo
   
   if (nReadyFds > 0)
   {
-    char *buf = new char[200];
-    int ret = recv(this->_sockfd, buf, 200, 0);
+    char* buf = new char[512];
+    memset(buf, 0, 512);
+    int ret = recv(this->_sockfd, buf, 512, 0);
 
     if (ret == WSAECONNRESET)
     {
       this->disconnect();
-      delete buf;
+      delete[] buf;
       return ReturnTypes::RECV_CONNRST | ReturnTypes::RECV_FAIL;
     } else if (ret <= 0) {
       this->disconnect();
-      delete buf;
+      delete[] buf;
       return ReturnTypes::RECV_FAIL | ReturnTypes::RECV_CONNSHUTDOWN;
     } else {
-      size_t len = 200;
-      char *token;
+      size_t len = 512;
+      char* token;
+      char* oldBuf = buf;
 
       while (common::next_tokenize(&buf, &len, '\n', &token))
-        msgs.push_back(Message::parseReceivedMessage(buf));
-      
-      delete buf;
+      {
+        common::debug << token;
+        msgs.push_back(Message::parseReceivedMessage(token));
+      }
+            
+      delete[] oldBuf;      
       return ReturnTypes::RECV_OK;
     }
   }

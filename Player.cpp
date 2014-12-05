@@ -24,19 +24,14 @@ void Player::login()
 
 bool Player::connect(const Zone& zone)
 {
-  if (this->_connection)
-    return false;
-
+  // TODO check if connected already
   return this->_connection->connect(zone) == ChatnetConnection::ReturnTypes::CONN_OK;
 }
 
 bool Player::disconnect()
 {
-  if (!this->_connection)
-    return false;
-
   this->_connection->disconnect();
-  this->_connection = nullptr;
+  this->_connection = std::make_shared<ChatnetConnection>(); // Reset, TODO make more efficient
 
   return true;
 }

@@ -2,6 +2,7 @@
 #define __COMMON_H__
 
 #include <algorithm>
+#include <iostream>
 #include <iterator>
 #include <string>
 #include <type_traits>
@@ -14,16 +15,34 @@
   }
 
 #define BASIC_CMD_RGX(CMD_NAME)\
-  "^\\s*?\\!" #CMD_NAME "\\s*?$"
+  "^\\s*?\\!" #CMD_NAME "\\s*?$", std::regex_constants::icase
+
+#define SUPPRESS_UNUSED(VARIABLE)\
+  (void) VARIABLE
 
 namespace common
 {
 
-inline void program_initialize();
-inline void program_cleanup();
+void program_initialize();
+void program_cleanup();
+
+struct _debug
+{
+  template <typename T>
+  _debug& operator<<(const T& message)
+  {
+#ifndef NDEBUG
+    std::cout << message << std::endl;
+#endif
+    return *this;
+  }
+};
+
+static _debug debug;
 
 static inline void sto_lower(std::string &str)
 {
+  SUPPRESS_UNUSED(debug);
   std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 }
 

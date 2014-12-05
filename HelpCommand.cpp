@@ -10,7 +10,7 @@
 
 static const std::regex _HELP_RGX(BASIC_CMD_RGX(help));
 
-void HelpCommand::_onMessage(std::shared_ptr<Player> player, const Message& message)
+void HelpCommand::_onMessage(Player* player, const Message& message)
 {
 	if (message.TYPE != Message::Type::MSG_PRIVATE)
 		return;

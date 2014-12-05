@@ -27,6 +27,8 @@ public:
   {
     std::lock_guard<std::mutex> lock(this->_mtx);
     this->_simpleTasks.push(std::forward<FunctionT>(fn));
+    this->_simpleTasksLen++;
+    this->_spuriousGuard = true;
     this->_cv.notify_one();
   } // TODO: Change to .tpp
 
@@ -36,9 +38,11 @@ private:
   std::atomic<bool> _running;
   std::atomic<int> _simpleTasksLen;
   std::condition_variable _cv;
+  std::mutex _cvMtx;
   std::mutex _mtx;
   std::vector<std::thread> _threads;
   std::queue<std::function<void()>> _simpleTasks;
+  std::atomic<bool> _spuriousGuard;
 };
 
 #endif

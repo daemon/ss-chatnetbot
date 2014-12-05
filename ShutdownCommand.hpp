@@ -9,15 +9,15 @@ class ChatnetBot; // chatnetbot.hpp
 class Player; // Player.hpp
 class Message; // Message.hpp
 
-static const std::string OWNER_COMMAND_NAME = "owner";
-static const std::string OWNER_COMMAND_DOC  = "Shows the owner. !owner";
+static const std::string SHUTDOWN_COMMAND_NAME = "owner";
+static const std::string SHUTDOWN_COMMAND_DOC  = "Shows the owner. !owner";
 
 class ShutdownCommand : public Command
 {
 public:
-  ShutdownCommand() : Command(OWNER_COMMAND_NAME, OWNER_COMMAND_DOC) {}
+  ShutdownCommand() : Command(SHUTDOWN_COMMAND_NAME, SHUTDOWN_COMMAND_DOC) {}
 private:
-  virtual void _onMessage(std::shared_ptr<Player> player, const Message& message);
+  virtual void _onMessage(Player* player, const Message& message);
 };
 
 #endif

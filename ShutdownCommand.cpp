@@ -10,7 +10,7 @@
 
 static const std::regex _SHUTDOWN_RGX(BASIC_CMD_RGX(shutdown));
 
-void ShutdownCommand::_onMessage(std::shared_ptr<Player> player, const Message& message)
+void ShutdownCommand::_onMessage(Player* player, const Message& message)
 {
 	if (message.TYPE != Message::Type::MSG_PRIVATE)
 		return;

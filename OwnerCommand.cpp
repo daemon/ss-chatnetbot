@@ -8,7 +8,7 @@
 
 static const std::regex _OWNER_RGX(BASIC_CMD_RGX(owner));
 
-void OwnerCommand::_onMessage(std::shared_ptr<Player> player, const Message& message)
+void OwnerCommand::_onMessage(Player* player, const Message& message)
 {
 	if (message.TYPE != Message::Type::MSG_PRIVATE)
 		return;

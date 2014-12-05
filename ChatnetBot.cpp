@@ -2,6 +2,7 @@
 #include <functional>
 #include <type_traits>
 #include <utility>
+#include <iostream>
 #include <winsock2.h>
 
 #include "ChatnetBot.hpp"
@@ -12,8 +13,6 @@
 
 ChatnetBot::ChatnetBot(std::shared_ptr<Player> player) : _player(player), _running(false)
 {
-  this->_uMtxMap = std::unique_lock<std::mutex>(this->_mtxMap); // fix
-  this->_uMtxMap.unlock();
   this->_player->addObserver(this);
 }
 
@@ -50,31 +49,31 @@ bool ChatnetBot::login()
 void ChatnetBot::run(bool blocking)
 {
   this->_player->runListen();
+  this->_running = true;
   this->_thd = std::thread(std::bind(&ChatnetBot::_run, this, blocking));
+  this->_thd.join();
 }
 
 void ChatnetBot::stop()
 {
+  this->_player->stopListen();
   this->_running = false;
   this->_cv.notify_all();
-  if (this->_thd.joinable())
-    this->_thd.join();
 }
 
 void ChatnetBot::_notify(Player* player, Message message)
 {
-  this->_uMtxMap.lock();
   this->_recvQueue[player] = message;
   this->_cv.notify_all(); 
 }
 
 void ChatnetBot::_run(bool blocking)
 {
-  this->_uMtxMap.lock();
-  // Don't care about @blocking for now...implement later
+  std::unique_lock<std::mutex> lock(this->_mtxMap);
+  // Don't care about @blocking for now...implement later TODO
   while (this->_running)
   {
-    this->_cv.wait(this->_uMtxMap);
+    this->_cv.wait(lock);
     if (!this->_running)
       break;
     else
@@ -84,7 +83,6 @@ void ChatnetBot::_run(bool blocking)
             c->onMessage(p.first /* shptrPlayer */, p.second /* Message */);        
     }
   }
-  this->_uMtxMap.unlock();
 }
 
 std::vector<std::unique_ptr<CommandSet>>& ChatnetBot::getCommandSets()

@@ -17,7 +17,7 @@ class AboutCommand : public Command
 public:
   AboutCommand(const std::string& aboutText) : Command(ABOUT_COMMAND_NAME, ABOUT_COMMAND_DOC), _aboutText(aboutText) {}
 private:
-  virtual void _onMessage(std::shared_ptr<Player> player, const Message& message);
+  virtual void _onMessage(Player* player, const Message& message);
   std::string _aboutText;
 };
 

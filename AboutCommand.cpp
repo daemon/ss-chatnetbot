@@ -10,7 +10,7 @@
 
 static const std::regex _ABOUT_RGX(BASIC_CMD_RGX(about));
 
-void AboutCommand::_onMessage(std::shared_ptr<Player> player, const Message& message)
+void AboutCommand::_onMessage(Player* player, const Message& message)
 {
 	if (message.TYPE != Message::Type::MSG_PRIVATE)
 		return;

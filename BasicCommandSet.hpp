@@ -2,6 +2,7 @@
 #define __BASIC_COMMAND_SET_H__
 
 #include "CommandSet.hpp"
+#include <memory>
 
 class ChatnetBot; // ChatnetBot.hpp
 

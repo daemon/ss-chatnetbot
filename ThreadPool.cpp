@@ -3,7 +3,7 @@
 
 #include "ThreadPool.hpp"
 
-ThreadPool::ThreadPool(unsigned int nThreads) : _running(true), _simpleTasksLen(0)
+ThreadPool::ThreadPool(unsigned int nThreads) : _running(true), _simpleTasksLen(0), _spuriousGuard(false)
 {
   auto fn = std::bind(&ThreadPool::_run, this); 
 
@@ -19,18 +19,25 @@ ThreadPool::~ThreadPool()
 
 void ThreadPool::_run()
 {
-  std::mutex cvMtx;
-  std::unique_lock<std::mutex> cvLock(cvMtx);
+  std::unique_lock<std::mutex> cvLock(this->_cvMtx);
 
   while(this->_running)
   {
-    this->_cv.wait(cvLock);
-    this->_mtx.lock();
-    while (_simpleTasksLen > 0)
+    while (!this->_spuriousGuard)
+      this->_cv.wait(cvLock);
+    this->_spuriousGuard = false;
+    while (this->_simpleTasksLen > 0)
     {      
+      this->_mtx.lock();
+      if (this->_simpleTasksLen == 0)
+      {
+        this->_mtx.unlock();
+        break;
+      }
+
       auto fn = this->_simpleTasks.front();
       this->_simpleTasks.pop();
-      --_simpleTasksLen;
+      this->_simpleTasksLen += 1;
       this->_mtx.unlock();
 
       // Best exception handling ever
@@ -39,6 +46,5 @@ void ThreadPool::_run()
         fn();
       } catch(...) {}
     }
-    // Lock released here...
   }
 }

@@ -17,7 +17,7 @@ class HelpCommand : public Command
 public:
   HelpCommand(std::shared_ptr<ChatnetBot> bot) : Command(HELP_COMMAND_NAME, HELP_COMMAND_DOC), _bot(bot) {}
 private:
-  virtual void _onMessage(std::shared_ptr<Player> player, const Message& message);
+  virtual void _onMessage(Player* player, const Message& message);
   std::weak_ptr<ChatnetBot> _bot;
 };
 
