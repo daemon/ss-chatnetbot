@@ -3,10 +3,11 @@
 
 #include <atomic>
 #include <condition_variable>
-#include <map>
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <utility>
+#include <vector>
 
 #include "Message.hpp"
 #include "Observer.hpp"
@@ -41,7 +42,7 @@ private:
   
   std::vector<Zone> _zones;
   std::vector<std::unique_ptr<CommandSet>> _commandsets;
-  std::map<Player*, Message> _recvQueue;
+  std::vector<std::pair<Player*, Message>> _recvQueue;
   std::thread _thd;
   std::shared_ptr<Player> _player;
   std::condition_variable _cv;

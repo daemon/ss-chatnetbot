@@ -1,6 +1,7 @@
 #include <functional>
 #include <utility>
 
+#include "Common.hpp"
 #include "ThreadPool.hpp"
 
 ThreadPool::ThreadPool(unsigned int nThreads) : _running(true), _simpleTasksLen(0), _spuriousGuard(false)
@@ -37,7 +38,7 @@ void ThreadPool::_run()
 
       auto fn = this->_simpleTasks.front();
       this->_simpleTasks.pop();
-      this->_simpleTasksLen += 1;
+      this->_simpleTasksLen--;
       this->_mtx.unlock();
 
       // Best exception handling ever

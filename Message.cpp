@@ -20,7 +20,7 @@ Message Message::parseReceivedMessage(const std::string &message)
   	m.TYPE 		 = Type::MSG_TEAM;
   	m._message = match[2].str();
   }
-  common::debug << m._sender << m._message;
+  
   return m;
 }
 

@@ -63,7 +63,8 @@ void ChatnetBot::stop()
 
 void ChatnetBot::_notify(Player* player, Message message)
 {
-  this->_recvQueue[player] = message;
+  std::lock_guard<std::mutex> lock(this->_mtxMap);
+  this->_recvQueue.push_back(std::make_pair(player, message));
   this->_cv.notify_all(); 
 }
 
@@ -80,7 +81,11 @@ void ChatnetBot::_run(bool blocking)
     {
       for (auto p : this->_recvQueue)
         for (auto& c : this->_commandsets)
-            c->onMessage(p.first /* shptrPlayer */, p.second /* Message */);        
+        {
+          c->onMessage(p.first /* shptrPlayer */, p.second /* Message */);        
+        }
+      
+      this->_recvQueue.clear();
     }
   }
 }

@@ -1,4 +1,5 @@
 #include "CommandSet.hpp"
+#include "Common.hpp"
 #include "Message.hpp"
 #include "Player.hpp"
 #include "ThreadPool.hpp"

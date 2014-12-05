@@ -3,6 +3,7 @@
 #include <utility>
 
 #include "ChatnetConnection.hpp"
+#include "Common.hpp"
 #include "Message.hpp"
 #include "Player.hpp"
 
