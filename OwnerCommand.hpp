@@ -18,7 +18,7 @@ public:
   OwnerCommand(const std::string& ownerName) : Command(OWNER_COMMAND_NAME, OWNER_COMMAND_DOC), _owner(ownerName) {}
 private:
   virtual void _onMessage(std::shared_ptr<Player> player, const Message& message);
-  std::weak_ptr<ChatnetBot> _owner;
+  std::string _owner;
 };
 
 #endif

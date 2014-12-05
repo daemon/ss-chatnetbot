@@ -1,7 +1,9 @@
 #include "Common.hpp"
 
+#if !defined(WIN32_LEAN_AND_MEAN) && !(_WIN32_WINNT == 0x0501)
 #define WIN32_LEAN_AND_MEAN
 #define _WIN32_WINNT 0x0501
+#endif
 
 #include <cassert>
 #include <windows.h>

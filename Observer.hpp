@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 template <typename T, typename = void>
@@ -20,29 +21,19 @@ struct is_observer<T, typename std::enable_if<T::is_observer>::type>
 namespace common
 {
 
-template <typename ObservedType, typename ReturnType>
+template <typename ObservedType, typename MessageType>
 class Observer
 {
 public:
-  void notify(ObservedType &notifier, ReturnType &&message);
+  void update(ObservedType* notifier, MessageType message)
+  {
+    this->_notify(notifier, message);
+  }
 
   static constexpr bool is_observer = true;
 
 private:
-  virtual void _notify(ObservedType*, ReturnType) = 0;
-};
-
-// Partial specialization for shared_ptr
-template <typename ObservedType, typename ReturnType>
-class Observer<std::shared_ptr<ObservedType>, ReturnType>
-{
-public:
-  void notify(ObservedType &notifier, ReturnType &&message);
-
-  static constexpr bool is_observer = true;
-
-private:
-  virtual void _notify(std::shared_ptr<ObservedType>, ReturnType) = 0;
+  virtual void _notify(ObservedType*, MessageType) = 0;
 };
 
 }

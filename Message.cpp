@@ -1,7 +1,7 @@
 #include "Message.hpp"
 
-const std::regex Message::_RGX_PRIV(R"^MSG:PRIV:(\w+?):(\w+?)$");
-const std::regex Message::_RGX_TEAM(R"^MSG:FREQ:(\w+?):(\w+?)$");
+const std::regex Message::_RGX_PRIV(R"_(^MSG:PRIV:(\w+?):(\w+?)$)_");
+const std::regex Message::_RGX_TEAM(R"_(^MSG:FREQ:(\w+?):(\w+?)$)_");
 
 Message Message::parseReceivedMessage(const std::string &message)
 {  
@@ -9,31 +9,31 @@ Message Message::parseReceivedMessage(const std::string &message)
   Message m(message);
 
   // Should convert to CoR...
-  if (std::regex_search(message.begin(), message.end(), match, Message::_RGX_PRIV))
+  if (std::regex_search(message, match, Message::_RGX_PRIV))
   {
-  	m._sender 	= m[1];
-    m.TYPE 		= Type::MSG_PRIVATE;
-  	m._message 	= m[2];
-  } else if (std::regex_search(message.begin(), message.end(), match, Message::_RGX_TEAM)) {
-  	m._sender	= m[1];
-  	m.TYPE 		= Type::MSG_TEAM;
-  	m._message 	= m[2];
+  	m._sender   = match[1].str();
+    m.TYPE 		  = Type::MSG_PRIVATE;
+  	m._message 	= match[2].str();
+  } else if (std::regex_search(message, match, Message::_RGX_TEAM)) {
+  	m._sender	 = match[1].str();
+  	m.TYPE 		 = Type::MSG_TEAM;
+  	m._message = match[2].str();
   }
 
   return m;
 }
 
-std::string& Message::getSender() const
+std::string Message::getSender() const
 {
 	return this->_sender;
 }
 
-std::string& Message::getRawMessage() const
+std::string Message::getRawMessage() const
 {
 	return this->_rawMessage;
 }
 
-std::string& Message::getMessage() const
+std::string Message::getMessage() const
 {
 	return this->_message;
 }

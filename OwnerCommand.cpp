@@ -13,12 +13,7 @@ void OwnerCommand::_onMessage(std::shared_ptr<Player> player, const Message& mes
 	if (message.TYPE != Message::Type::MSG_PRIVATE)
 		return;
 	else if (!std::regex_match(message.getMessage(), _OWNER_RGX))
-		return;
-
-  auto ptr = this->_bot.lock();
-
-  if (!ptr)
-  	return;
+		return;  
 
   player->sendPrivateMessage(message.getSender(), this->_owner);
 }

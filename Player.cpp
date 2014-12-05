@@ -1,6 +1,8 @@
 #include <functional>
+#include <list>
 #include <utility>
 
+#include "ChatnetConnection.hpp"
 #include "Message.hpp"
 #include "Player.hpp"
 
@@ -10,9 +12,14 @@ Player::Player(const std::string &name, const std::string &password) : _name(nam
   this->_connection = std::make_shared<ChatnetConnection>();
 }
 
-std::weak_ptr<ChatnetConnection> getConnection()
+std::weak_ptr<ChatnetConnection> Player::getConnection()
 {
   return this->_connection;
+}
+
+void Player::login()
+{
+  this->_connection->send(Message::createLoginMessage(this->_name, this->_password));
 }
 
 bool Player::connect(const Zone& zone)
@@ -20,13 +27,14 @@ bool Player::connect(const Zone& zone)
   if (this->_connection)
     return false;
 
-  return this->_connection->connect(zone) == ChatConnection::ReturnTypes::CONN_OK;
+  return this->_connection->connect(zone) == ChatnetConnection::ReturnTypes::CONN_OK;
 }
 
 bool Player::disconnect()
 {
   if (!this->_connection)
     return false;
+
   this->_connection->disconnect();
   this->_connection = nullptr;
 
@@ -50,8 +58,8 @@ void Player::_runListen()
   {
     if (conn->listen(msgs) == ChatnetConnection::ReturnTypes::RECV_OK)
     {
-      for (auto m : msgs)
-        this->notifyAll(m);
+      for (Message m : msgs)
+        this->notifyAll(this, m);
       msgs.clear();
     }
   }
@@ -68,21 +76,15 @@ void Player::stopListen()
 
 void Player::sendFreqMessage(const std::string& freq, const std::string& message)
 {
-  if (!*(this->_connection))
-    return;
   this->_connection->send(Message::createTeamMessage(this->_name, freq, message));
 }
 
 void Player::sendPrivateMessage(const std::string& playerTo, const std::string& message)
 {
-  if (!*(this->_connection))
-    return;
   this->_connection->send(Message::createPrivateMessage(this->_name, playerTo, message));
 }
 
 void Player::goToArena(const std::string& arena)
 {
-  if (!*(this->_connection))
-    return;
   this->_connection->send(Message::createGoMessage(arena));
 }

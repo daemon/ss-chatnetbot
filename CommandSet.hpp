@@ -18,8 +18,8 @@ public:
   std::vector<std::unique_ptr<Command>>& getCommands();
   void addCommand(std::unique_ptr<Command> command);
 private:
-  virtual void _onMessage(std::shared_ptr<Player> player, const Message& message);
-  void _dispatchMessage(std::shared_ptr<Player> player, const Message& message);
+  virtual void _onMessage(Player* player, const Message& message);
+  void _dispatchMessage(Player* player, const Message& message);
 
   // @unsigned int: call count for optimization, will be recalibrated to prevent overflow...
   // TODO: make tree, priority queue...

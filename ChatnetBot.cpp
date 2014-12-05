@@ -5,20 +5,23 @@
 #include <winsock2.h>
 
 #include "ChatnetBot.hpp"
+#include "CommandSet.hpp"
 #include "Common.hpp"
+#include "Player.hpp"
 #include "Zone.hpp"
 
 ChatnetBot::ChatnetBot(std::shared_ptr<Player> player) : _player(player), _running(false)
 {
   this->_uMtxMap = std::unique_lock<std::mutex>(this->_mtxMap); // fix
   this->_uMtxMap.unlock();
+  this->_player->addObserver(this);
 }
 
 void ChatnetBot::addCommandSet(std::unique_ptr<CommandSet> set)
 {
   this->_commandsets.push_back(std::move(set));
 }
-
+/*
 void ChatnetBot::removeCommandSet(int id)
 {
   std::remove_if(this->_commandsets.begin(), this->_commandsets.end(),
@@ -27,24 +30,26 @@ void ChatnetBot::removeCommandSet(int id)
       return set->getId() == id;
     });
 }
-
-bool ChatnetBot::connect(const Zone& zone, bool blocking = true)
+*/
+bool ChatnetBot::connect(const Zone& zone, bool blocking)
 {
   return this->_player->connect(zone);
 }
 
-bool ChatnetBot::disconnect(bool blocking = true)
+bool ChatnetBot::disconnect(bool blocking)
 {
   return this->_player->disconnect();
 }
 
 bool ChatnetBot::login()
 {
-  return this->_player->login();
+  this->_player->login();
+  return true; // Implement later with futures..
 }
 
-void ChatnetBot::run(bool blocking = false)
+void ChatnetBot::run(bool blocking)
 {
+  this->_player->runListen();
   this->_thd = std::thread(std::bind(&ChatnetBot::_run, this, blocking));
 }
 
@@ -56,7 +61,7 @@ void ChatnetBot::stop()
     this->_thd.join();
 }
 
-void ChatnetBot::_notify(std::shared_ptr<Player> player, Message message)
+void ChatnetBot::_notify(Player* player, Message message)
 {
   this->_uMtxMap.lock();
   this->_recvQueue[player] = message;
@@ -75,14 +80,14 @@ void ChatnetBot::_run(bool blocking)
     else
     {
       for (auto p : this->_recvQueue)
-        for (auto c : this->_commandsets)
-            c.onMessage(c.first /* shptrPlayer */, c.second /* Message */);        
+        for (auto& c : this->_commandsets)
+            c->onMessage(p.first /* shptrPlayer */, p.second /* Message */);        
     }
   }
   this->_uMtxMap.unlock();
 }
 
-std::vector<CommandSet>& ChatnetBot::getCommandSets()
+std::vector<std::unique_ptr<CommandSet>>& ChatnetBot::getCommandSets()
 {
   return this->_commandsets;
 }

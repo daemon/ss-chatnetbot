@@ -6,11 +6,13 @@
 #include <atomic>
 #include <thread>
 
+#include "ChatnetBot.hpp"
 #include "Observable.hpp"
 #include "Zone.hpp"
 
 class ChatnetBot; // ChatnetBot.hpp
 class ChatnetConnection; // ChatnetConnection.hpp
+class Message; // Message.hpp
 
 class Player : public common::Observable<ChatnetBot, Message>
 {
@@ -23,6 +25,7 @@ public:
   void runListen();
   void stopListen();
 
+  void login();
   void sendFreqMessage(const std::string& freq, const std::string& message);
   void sendPrivateMessage(const std::string& playerTo, const std::string& message);
   void goToArena(const std::string& name);

@@ -8,19 +8,19 @@
 
 void CommandSet::addCommand(std::unique_ptr<Command> command)
 {
-  this->_commands.push_back(command);
+  this->_commands.push_back(std::move(command));
 }
 
-void CommandSet::_onMessage(std::shared_ptr<Player> player, const Message& message)
+void CommandSet::_onMessage(Player* player, const Message& message)
 {
   auto fn = std::bind(&CommandSet::_dispatchMessage, this, player, message);
   ThreadPool::instance().queueSimpleTask(fn);
 }
 
-void CommandSet::_dispatchMessage(std::shared_ptr<Player> player, const Message& message)
+void CommandSet::_dispatchMessage(Player* player, const Message& message)
 {
-  for (auto cmd : this->_commands)
-    cmd.onMessage(player, message);
+  for (auto& cmd : this->_commands)
+    cmd->onMessage(player, message);
 }
 
 std::vector<std::unique_ptr<Command>>& CommandSet::getCommands()

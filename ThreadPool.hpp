@@ -3,6 +3,7 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <functional>
 #include <mutex>
 #include <queue>
 #include <thread>
@@ -22,7 +23,12 @@ public:
   */
 
   template <typename FunctionT>
-  void queueSimpleTask(FunctionT&& fn);
+  void queueSimpleTask(FunctionT&& fn)
+  {
+    std::lock_guard<std::mutex> lock(this->_mtx);
+    this->_simpleTasks.push(std::forward<FunctionT>(fn));
+    this->_cv.notify_one();
+  } // TODO: Change to .tpp
 
 private:
   void _run();

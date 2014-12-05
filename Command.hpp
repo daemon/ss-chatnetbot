@@ -13,12 +13,12 @@ public:
   std::string getName() const;
   std::string getDocumentation() const;
 
-  onMessage(std::shared_ptr<Player> player, const Message& message);
+  void onMessage(Player* player, const Message& message);
 private:
-  virtual void _onMessage(std::shared_ptr<Player> player, const Message& message) = 0;
-
-  std::string _doc;
+  virtual void _onMessage(Player* player, const Message& message) = 0;
+  
   std::string _name;
+  std::string _doc;
 };
 
 #endif

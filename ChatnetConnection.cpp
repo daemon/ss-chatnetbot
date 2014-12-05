@@ -1,18 +1,22 @@
 #include <cassert>
 #include <cstring>
+#include <memory>
+#include <utility>
+#include <ws2tcpip.h>
+#include <winsock2.h>
 #include <windows.h>
 
 #include "ChatnetConnection.hpp"
 #include "Common.hpp"
 #include "Message.hpp"
 
-ChatnetConnection::ReturnType ChatnetConnection::connect(const Zone& zone)
+ReturnType ChatnetConnection::connect(const Zone& zone)
 {
   this->_sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   assert(this->_sockfd != INVALID_SOCKET);
 
   addrinfo hints, *result;
-  ZeroMemory(hints, sizeof(hints)); 
+  ZeroMemory(&hints, sizeof(hints)); 
   hints.ai_family     = AF_INET;
   hints.ai_socktype   = SOCK_STREAM;
   hints.ai_protocol   = IPPROTO_TCP;
@@ -20,7 +24,7 @@ ChatnetConnection::ReturnType ChatnetConnection::connect(const Zone& zone)
   int rv = getaddrinfo(zone.ip.c_str(), zone.port.c_str(), &hints, &result);
   assert(rv == 0);
 
-  int rv2 = connect(this->_sockfd, hints->ai_addr, sizeof(hints->ai_addr));
+  int rv2 = ::connect(this->_sockfd, result->ai_addr, sizeof(result->ai_addr));
   
   ReturnType retCode;
   if (rv2 == 0)
@@ -47,7 +51,7 @@ void ChatnetConnection::disconnect()
 {
   if (this->_sockfd >= 0)
   {
-    shutdown(this->_sockfd);
+    shutdown(this->_sockfd, SD_BOTH);
     closesocket(this->_sockfd);
   }
   this->_sockfd = -1;
@@ -58,12 +62,19 @@ bool ChatnetConnection::send(const Message& message)
   if (this->_sockfd < 0)
     return false;
 
-  int ret = send(this->_sockfd, message.getRawMessage().c_str(), message.length(), 0);
+  auto msg = message.getRawMessage().c_str();
+  int len = message.getRawMessage().length() + 1;
+  char *buf = new char[len];
+  
+  strcpy_s(buf, len - 1, msg);
+  buf[len - 1] = '\n'; 
 
+  int ret = ::send(this->_sockfd, message.getRawMessage().c_str(), len, 0);
+  delete buf;
   return ret != SOCKET_ERROR;
 }
 
-ReturnType ChatnetConnection::listen(std::list<Message>& msgs, unsigned int blockTimeSec = 8)
+ReturnType ChatnetConnection::listen(std::list<Message>& msgs, unsigned long blockTimeSec)
 {
   if (this->_sockfd < 0)
     return ReturnTypes::RECV_FAIL;
@@ -82,15 +93,17 @@ ReturnType ChatnetConnection::listen(std::list<Message>& msgs, unsigned int bloc
   
   if (nReadyFds > 0)
   {
-    char buf[200];
-    int ret = recv(this->_sockfd, &buf, 200, 0);
+    char *buf = new char[200];
+    int ret = recv(this->_sockfd, buf, 200, 0);
 
-    if (ret == WSACONNRESET)
+    if (ret == WSAECONNRESET)
     {
       this->disconnect();
-      return ReturnTypes::RECV_CONNRST | RECV_FAIL;
+      delete buf;
+      return ReturnTypes::RECV_CONNRST | ReturnTypes::RECV_FAIL;
     } else if (ret <= 0) {
       this->disconnect();
+      delete buf;
       return ReturnTypes::RECV_FAIL | ReturnTypes::RECV_CONNSHUTDOWN;
     } else {
       size_t len = 200;
@@ -99,7 +112,9 @@ ReturnType ChatnetConnection::listen(std::list<Message>& msgs, unsigned int bloc
       while (common::next_tokenize(&buf, &len, '\n', &token))
         msgs.push_back(Message::parseReceivedMessage(buf));
       
+      delete buf;
       return ReturnTypes::RECV_OK;
     }
   }
+  return ReturnTypes::RECV_FAIL;
 }

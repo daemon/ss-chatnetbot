@@ -14,11 +14,12 @@ public:
   , MSG_TEAM
   };
 
-  Message(const std::string &message) : _rawMessage(message), TYPE(Type::MSG_NONE) {}
+  Message() : TYPE(Type::MSG_NONE) {}
+  Message(const std::string &message) : TYPE(Type::MSG_NONE), _rawMessage(message) {}
   
-  std::string& getSender() const;
-  std::string& getRawMessage() const;
-  std::string& getMessage() const;
+  std::string getSender() const;
+  std::string getRawMessage() const;
+  std::string getMessage() const;
 
   static Message parseReceivedMessage(const std::string& message);  
   static Message createPrivateMessage(const std::string& playerFrom, 

@@ -1,6 +1,6 @@
 #include "Command.hpp"
 
-void Command::onMessage(std::shared_ptr<Player> player, const Message& message)
+void Command::onMessage(Player* player, const Message& message)
 {
   this->_onMessage(player, message);
 }

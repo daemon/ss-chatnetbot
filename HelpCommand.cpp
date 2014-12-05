@@ -1,6 +1,8 @@
 #include <regex>
 #include <sstream>
 
+#include "ChatnetBot.hpp"
+#include "CommandSet.hpp"
 #include "Common.hpp"
 #include "HelpCommand.hpp"
 #include "Message.hpp"
@@ -22,9 +24,9 @@ void HelpCommand::_onMessage(std::shared_ptr<Player> player, const Message& mess
   std::stringstream ss;
   ss << "Commands:";
 
-  for (auto cmdset : ptr->getCommandSets())
-  	for (auto cmd : cmdset.getCommands())
-  		ss << " " << cmd.getName();
+  for (auto& cmdset : ptr->getCommandSets())
+  	for (auto& cmd : cmdset->getCommands())
+  		ss << " " << cmd->getName();
 
   player->sendPrivateMessage(message.getSender(), ss.str());
 }

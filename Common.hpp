@@ -14,7 +14,7 @@
   }
 
 #define BASIC_CMD_RGX(CMD_NAME)\
-  "^\\s*?(?i)\\!" #CMD_NAME "\\s*?$"
+  "^\\s*?\\!" #CMD_NAME "\\s*?$"
 
 namespace common
 {
@@ -24,7 +24,7 @@ inline void program_cleanup();
 
 static inline void sto_lower(std::string &str)
 {
-  std::transform(str.begin(), str.end(), ::tolower);
+  std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 }
 
 template <typename T, typename U>
@@ -58,4 +58,5 @@ static inline bool next_tokenize(char **buffer, size_t *length, char delim, char
   return false;
 }
 
+}
 #endif

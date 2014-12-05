@@ -3,6 +3,8 @@
 
 #include <memory>
 #include <vector>
+#include <type_traits>
+#include "Observer.hpp"
 
 template <typename T, typename = void>
 struct is_observable
@@ -23,31 +25,24 @@ template <typename ObserverType, typename MessageType>
 class Observable
 {
 public:
-  void notifyAll(MessageType &&message);
-  void addObserver(ObserverType *observer);
-  void removeObserver(ObserverType *observer);
+  template <typename SelfType>
+  void notifyAll(SelfType *self, MessageType message)
+  {
+    static_assert(is_observer<ObserverType>::value, "Not an observer.");
+    for (ObserverType* observer : this->_observers)
+      observer->update(self, message);
+  }
 
-  std::vector<ObserverType *> getObservers() const;
-
-  static constexpr bool is_observable = true;
-private:
-  std::vector<ObserverType *> _observers;
-};
-
-template <typename ObserverType, typename MessageType>
-class Observable<typename std::shared_ptr<ObserverType>, MessageType>
-{
-public:
-  void notifyAll(MessageType &&message);
-  void addObserver(std::shared_ptr<ObserverType> observer);
-  void removeObserver(std::shared_ptr<ObserverType> observer);
-  
-  std::vector<std::shared_ptr<ObserverType>> getObservers() const;
+  void addObserver(ObserverType* observer)
+  {
+    this->_observers.push_back(observer);
+  }
 
   static constexpr bool is_observable = true;
 private:
-  std::vector<std::shared_ptr<ObserverType>> _observers;
+  std::vector<ObserverType*> _observers;
 };
 
+// Change to .tpp
 }
 #endif

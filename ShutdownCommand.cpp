@@ -21,7 +21,7 @@ void ShutdownCommand::_onMessage(std::shared_ptr<Player> player, const Message& 
 	static const std::vector<std::string> mods{"ceiu", "noldec", "nn", "cdb-man"};
 	common::sto_lower(sender);
 
-	if (std::find(mods.begin(), mods.end(), sender))
+	if (std::find(mods.begin(), mods.end(), sender) != mods.end())
 	{
 		player->sendPrivateMessage(message.getSender(), "Shuting down, you're High-ness..."); // Yes, this is a joke.
 		// Change later.

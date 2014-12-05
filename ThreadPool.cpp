@@ -3,7 +3,7 @@
 
 #include "ThreadPool.hpp"
 
-ThreadPool::ThreadPool(unsigned int nThreads = 2) : _running(true), _simpleTasksLen(0)
+ThreadPool::ThreadPool(unsigned int nThreads) : _running(true), _simpleTasksLen(0)
 {
   auto fn = std::bind(&ThreadPool::_run, this); 
 
@@ -17,14 +17,6 @@ ThreadPool::~ThreadPool()
   this->_cv.notify_all();
 }
 
-template <typename FunctionT>
-void ThreadPool::queueSimpleTask(FunctionT&& fn)
-{
-  std::lock_guard<std::mutex> lock(this->_mtx);
-  this->_simpleTasks.push(std::forward<FunctionT>(fn));
-  this->_cv.notify_one();
-}
-
 void ThreadPool::_run()
 {
   std::mutex cvMtx;
@@ -33,12 +25,13 @@ void ThreadPool::_run()
   while(this->_running)
   {
     this->_cv.wait(cvLock);
-    std::lock_guard<std::mutex> lock(this->_mtx);
+    this->_mtx.lock();
     while (_simpleTasksLen > 0)
     {      
-      auto fn = this->_simpleTasks.pop();
+      auto fn = this->_simpleTasks.front();
+      this->_simpleTasks.pop();
       --_simpleTasksLen;
-      lock.unlock();
+      this->_mtx.unlock();
 
       // Best exception handling ever
       try
