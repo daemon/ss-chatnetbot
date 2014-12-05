@@ -12,8 +12,8 @@
 
 int main(int argc, char **argv)
 {
-	common::program_initialize();
-	auto player = std::make_shared<Player>("ycombinator-3", "PASSWORD_HERE");
+  common::program_initialize();
+  auto player = std::make_shared<Player>("ycombinator-3", "PASSWORD_HERE");
   auto bot = std::make_shared<ChatnetBot>(player);
 
   std::unique_ptr<CommandSet> basicCommandSet(new BasicCommandSet("Beep.", "nn", bot));
@@ -22,8 +22,8 @@ int main(int argc, char **argv)
   if (!bot->connect(Zone("Hyperspace", "142.4.200.80", "5005")))
   {
     std::cout << "Cannot connect!" << std::endl;
-  	bot->stop();
-  	return 0;
+    bot->stop();
+    return 0;
   }
   std::cout << "Connected." << std::endl;
   bot->login();

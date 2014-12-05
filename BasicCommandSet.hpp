@@ -9,9 +9,9 @@ class ChatnetBot; // ChatnetBot.hpp
 class BasicCommandSet : public CommandSet
 {
 public:
-	BasicCommandSet(const std::string& aboutText, 
-									const std::string& ownerName,
-									std::shared_ptr<ChatnetBot> bot);
+  BasicCommandSet(const std::string& aboutText, 
+                  const std::string& ownerName,
+                  std::shared_ptr<ChatnetBot> bot);
 };
 
 #endif

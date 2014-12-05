@@ -14,11 +14,11 @@
 
 void common::program_initialize()
 {
-	WSADATA tmp;
-	assert(WSAStartup(MAKEWORD(2, 2), &tmp) == 0);
+  WSADATA tmp;
+  assert(WSAStartup(MAKEWORD(2, 2), &tmp) == 0);
 }
 
 void common::program_cleanup()
 {
-	WSACleanup();
+  WSACleanup();
 }

@@ -13,7 +13,7 @@ class Message; // message.hpp
 class CommandSet : public Command
 {
 public:
-	CommandSet() : Command("", "") {}
+  CommandSet() : Command("", "") {}
 
   std::vector<std::unique_ptr<Command>>& getCommands();
   void addCommand(std::unique_ptr<Command> command);

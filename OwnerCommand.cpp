@@ -10,10 +10,10 @@ static const std::regex _OWNER_RGX(BASIC_CMD_RGX(owner));
 
 void OwnerCommand::_onMessage(Player* player, const Message& message)
 {
-	if (message.TYPE != Message::Type::MSG_PRIVATE)
-		return;
-	else if (!std::regex_match(message.getMessage(), _OWNER_RGX))
-		return;  
+  if (message.TYPE != Message::Type::MSG_PRIVATE)
+    return;
+  else if (!std::regex_match(message.getMessage(), _OWNER_RGX))
+    return;  
 
   player->sendPrivateMessage(message.getSender(), this->_owner);
 }
