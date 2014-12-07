@@ -1,8 +1,10 @@
 CC = g++
-CFLAGS = -O3 -Wall -std=c++11 -g
-LDFLAGS = -lws2_32 -lwsock32 -pthread
-OBJECTS = BasicCommandSet.o ChatnetBot.o main.o Command.o AboutCommand.o ChatnetConnection.o Common.o CommandSet.o HelpCommand.o Message.o OwnerCommand.o Player.o ShutdownCommand.o ThreadPool.o 
-EXEC = chatnetbot
+CFLAGS = -O3 -Wall -std=c++11
+DEPENDS = depends
+SRC = src
+LDFLAGS = -L$(DEPENDS)/sqlite3 -lws2_32 -lwsock32 -pthread -lsqlite3
+OBJECTS = $(SRC)/BasicCommandSet.o $(SRC)/ChatnetBot.o $(SRC)/main.o $(SRC)/Command.o $(SRC)/AboutCommand.o $(SRC)/ChatnetConnection.o $(SRC)/Common.o $(SRC)/CommandSet.o $(SRC)/HelpCommand.o $(SRC)/Message.o $(SRC)/OwnerCommand.o $(SRC)/Player.o $(SRC)/ShutdownCommand.o $(SRC)/ThreadPool.o 
+EXEC = bin/chatnetbot
 
 $(EXEC): $(OBJECTS)
 	$(CC) $(OBJECTS) -o $(EXEC) $(LDFLAGS)
@@ -10,5 +12,7 @@ $(EXEC): $(OBJECTS)
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c $< -o $@
 
+.PHONY: clean
+
 clean:
-	rm *.o
+	rm $(SRC)/*.o
