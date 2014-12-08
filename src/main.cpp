@@ -13,7 +13,7 @@
 int main(int argc, char **argv)
 {
   common::program_initialize();
-  auto player = std::make_shared<Player>("UB-Dr Brain", "ralphtango");
+  auto player = std::make_shared<Player>("UB-Dr Brain", "password");
   auto bot = std::make_shared<ChatnetBot>(player);
 
   std::unique_ptr<CommandSet> basicCommandSet(new BasicCommandSet("!say <name> in team chat or private message.", "nn", bot));
