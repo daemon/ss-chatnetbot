@@ -11,10 +11,9 @@ static const std::string SAY_COMMAND_DOC  = "Constructs a sentence that <player>
 class SayCommand : public Command
 {
 public:
-  SayCommand(std::weak_ptr<MarkovDatabase> database) : _database(database) {}
+  SayCommand() : Command(SAY_COMMAND_NAME, SAY_COMMAND_DOC) {}
 private:
   virtual void _onMessage(Player* player, const Message& message);
-  std::weak_ptr<MarkovDatabase> _database;
 };
 
 #endif
