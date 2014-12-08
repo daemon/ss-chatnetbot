@@ -14,7 +14,7 @@
 ReturnType ChatnetConnection::connect(const Zone& zone)
 {
   this->_sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-  assert(this->_sockfd != INVALID_SOCKET);
+  assert(this->_sockfd != static_cast<int>(INVALID_SOCKET));
 
   addrinfo hints, *result;
   ZeroMemory(&hints, sizeof(hints)); 

@@ -1,14 +1,19 @@
 #include "CvDatabaseConnection.hpp"
 #include <chrono>
+#include <iostream>
 #include <thread>
 #include <cstdlib>
 #include <ctime>
 
 CvDatabaseConnection::CvDatabaseConnection(const std::string& filename)
- : _stddev(0), _avgLineLength(0), _filename(filename), _handle(nullptr)
+ : _stddev(0), _avgLineLength(0), _handle(nullptr)
 {
+  this->_filename = "file:" + filename;
   if (filename != "")
+  {
     sqlite3_open(filename.c_str(), &this->_handle);
+
+  }
 }
 
 CvDatabaseConnection::~CvDatabaseConnection()
@@ -24,26 +29,25 @@ void CvDatabaseConnection::close()
 
 std::string CvDatabaseConnection::getRandomStartingWord(const std::string& name)
 {
-  std::string statement = "SELECT * FROM conversations WHERE `name`=" + name +
-    " AND `starting`=1";
+  std::string statement = "SELECT * FROM conversations WHERE `name` COLLATE NOCASE =? AND `is_starting`=1";
   sqlite3_stmt* stmtObj;
 
   int rc = sqlite3_prepare_v2(this->_handle,
                               statement.c_str(),
-                              statement.length(),
+                              statement.length() + 1,
                               &stmtObj,
                               NULL);
   if (rc != SQLITE_OK)
     return "";
-
+  
   sqlite3_bind_text(stmtObj, 1, name.c_str(), -1, 0);
   std::vector<std::string> words;
 
-  while ((rc = sqlite3_step(stmtObj)))
+  while (rc = sqlite3_step(stmtObj), 1)
   {
     if (rc == SQLITE_DONE)
       break;
-    else if (rc == SQLITE_OK)
+    else if (rc == SQLITE_ROW)
     {
       std::string columnText(reinterpret_cast<const char*>(sqlite3_column_text(stmtObj, 2)));
       words.push_back(columnText);
@@ -55,9 +59,12 @@ std::string CvDatabaseConnection::getRandomStartingWord(const std::string& name)
       break;
   }
 
+  if (words.size() == 0)
+    return "";
+
   sqlite3_finalize(stmtObj);
   srand(time(NULL));
-
+  
   return words[rand() % words.size()];
 }
 
@@ -70,14 +77,13 @@ std::string CvDatabaseConnection::getRandomStartingWord(const std::string& name)
 );*/
 std::vector<std::string> CvDatabaseConnection::getPossibleWordsOf(const std::string& name, const std::string& word)
 {
-  std::string statement = "SELECT * FROM conversations WHERE `name`=" + name + 
-    " AND `word_a`=" + word + " AND `starting`=0";
+  std::string statement = "SELECT * FROM conversations WHERE `name` COLLATE NOCASE =? AND `word_a`=?";
 
   sqlite3_stmt* stmtObj;
   
   int rc = sqlite3_prepare_v2(this->_handle, 
                               statement.c_str(), 
-                              statement.length(), 
+                              statement.length() + 1, 
                               &stmtObj, 
                               NULL);
   if (rc != SQLITE_OK)
@@ -92,7 +98,7 @@ std::vector<std::string> CvDatabaseConnection::getPossibleWordsOf(const std::str
   {
     if (rc == SQLITE_DONE)
       break;
-    else if (rc == SQLITE_OK)
+    else if (rc == SQLITE_ROW)
     {
       std::string columnText(reinterpret_cast<const char*>(sqlite3_column_text(stmtObj, 3)));
       words.push_back(columnText);

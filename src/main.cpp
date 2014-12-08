@@ -13,10 +13,10 @@
 int main(int argc, char **argv)
 {
   common::program_initialize();
-  auto player = std::make_shared<Player>("UB-Casino", "ralphtango");
+  auto player = std::make_shared<Player>("UB", "ralphtango");
   auto bot = std::make_shared<ChatnetBot>(player);
 
-  std::unique_ptr<CommandSet> basicCommandSet(new BasicCommandSet("Beep.", "nn", bot));
+  std::unique_ptr<CommandSet> basicCommandSet(new BasicCommandSet("!say <name> in team chat or private message.", "nn", bot));
   bot->addCommandSet(std::move(basicCommandSet));
 
   if (!bot->connect(Zone("Hyperspace", "142.4.200.80", "5005")))
