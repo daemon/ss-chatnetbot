@@ -24,10 +24,10 @@ CvDatabaseConnection::~CvDatabaseConnection()
 void CvDatabaseConnection::close()
 {
   if (this->_filename != "")
-    sqlite3_open(this->_filename.c_str(), &this->_handle);
+    sqlite3_close(this->_handle);
 }
 
-std::string CvDatabaseConnection::getRandomStartingWord(const std::string& name)
+std::string CvDatabaseConnection::getRandomStartingWord(const std::string& name, std::string* realName)
 {
   std::string statement = "SELECT * FROM conversations WHERE `name` COLLATE NOCASE =? AND `is_starting`=1";
   sqlite3_stmt* stmtObj;
@@ -42,6 +42,7 @@ std::string CvDatabaseConnection::getRandomStartingWord(const std::string& name)
   
   sqlite3_bind_text(stmtObj, 1, name.c_str(), -1, 0);
   std::vector<std::string> words;
+  bool flag = true;
 
   while (rc = sqlite3_step(stmtObj), 1)
   {
@@ -49,6 +50,11 @@ std::string CvDatabaseConnection::getRandomStartingWord(const std::string& name)
       break;
     else if (rc == SQLITE_ROW)
     {
+      if (flag)
+      {
+        *realName = reinterpret_cast<const char*>(sqlite3_column_text(stmtObj, 1));
+        flag = false;
+      }
       std::string columnText(reinterpret_cast<const char*>(sqlite3_column_text(stmtObj, 2)));
       words.push_back(columnText);
     } else if (rc == SQLITE_BUSY) {

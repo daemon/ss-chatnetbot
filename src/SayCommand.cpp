@@ -26,7 +26,8 @@ void SayCommand::_onMessage(Player* player, const Message& message)
 
   std::string name(m[1].str());
   auto conn = CvDatabase::instance("conversations.db").newConnection();
-  std::string startingWord = conn.getRandomStartingWord(name);
+  std::string realName;
+  std::string startingWord = conn.getRandomStartingWord(name, &realName);
 
   if (startingWord == "")
   {
@@ -63,5 +64,5 @@ void SayCommand::_onMessage(Player* player, const Message& message)
       break; // temporary
   }
   // TODO add freq attribute to player...
-  player->sendFreqMessage("1337", name + "> " + word);
+  player->sendFreqMessage("1337", realName + "> " + word);
 }

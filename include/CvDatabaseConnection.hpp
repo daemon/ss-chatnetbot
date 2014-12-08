@@ -13,7 +13,7 @@ public:
   CvDatabaseConnection(const std::string& filename);
   ~CvDatabaseConnection();
 
-  std::string getRandomStartingWord(const std::string& name);
+  std::string getRandomStartingWord(const std::string& name, std::string* realName);
   std::vector<std::string> getPossibleWordsOf(const std::string& name, 
                                               const std::string& word);
   double getAverageLineLength();
