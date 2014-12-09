@@ -4,6 +4,7 @@ import re
 import sqlite3
 
 '''
+Python 2.7
 Small script to convert ss convo logs to sqlite3 sentence generator database
 '''
 

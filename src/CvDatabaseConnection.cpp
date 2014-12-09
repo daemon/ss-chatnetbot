@@ -12,7 +12,6 @@ CvDatabaseConnection::CvDatabaseConnection(const std::string& filename)
   if (filename != "")
   {
     sqlite3_open(filename.c_str(), &this->_handle);
-
   }
 }
 
