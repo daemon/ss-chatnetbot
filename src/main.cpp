@@ -16,7 +16,7 @@ int main(int argc, char **argv)
   auto player = std::make_shared<Player>("UB-Dr Brain", "password");
   auto bot = std::make_shared<ChatnetBot>(player);
 
-  std::unique_ptr<CommandSet> basicCommandSet(new BasicCommandSet("!say <name> in team chat or private message.", "nn", bot));
+  std::unique_ptr<CommandSet> basicCommandSet(new BasicCommandSet("I compute good ship builds using simple rules. PM me !help build.", "nn", bot));
   bot->addCommandSet(std::move(basicCommandSet));
 
   if (!bot->connect(Zone("Hyperspace", "142.4.200.80", "5005")))
