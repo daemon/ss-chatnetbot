@@ -9,12 +9,12 @@ class ItemCategory; // Item.hpp
 class CategoryStore
 {
 public:
-  CategoryStore& getInstance();
-  std::shared_ptr<ItemCategory> register(int id, const std::string& name);
+  static CategoryStore& getInstance();
+  std::shared_ptr<ItemCategory> create(int id, const std::string& name);
   std::shared_ptr<ItemCategory> get(int id);
 private:
-  CategoryStore();
-  std::unordered_map<int, ItemCategory> _categories;
+  CategoryStore() {}
+  std::unordered_map<int, std::shared_ptr<ItemCategory>> _categories;
 };
 
 #endif

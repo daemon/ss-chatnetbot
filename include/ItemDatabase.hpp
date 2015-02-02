@@ -8,12 +8,13 @@ class Item; // Item.hpp
 class ItemDatabase
 {
 public:
-  static ItemStore& getInstance();
-  std::vector<Item> loadItems();
-  bool isLoaded() const { return this->_loaded }
+  static ItemDatabase& getInstance();
+  std::vector<Item>& getItems();
+  bool isLoaded() const { return this->_loaded; }
 private:
-  ItemStore() : _loaded(false) {}
+  ItemDatabase() : _loaded(false) {}
   bool _loaded;
+  std::vector<Item> _items;
 };
 
 #endif

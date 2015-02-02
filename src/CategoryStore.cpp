@@ -2,21 +2,16 @@
 #include "CategoryStore.hpp"
 #include "Item.hpp"
 
-CategoryStore::CategoryStore()
-{
-  this->_categories = std::unordered_map<int, ItemCategory>([](int id) { return id; });
-}
-
 CategoryStore& CategoryStore::getInstance()
 {
   static CategoryStore s;
   return s;
 }
 
-std::shared_ptr<ItemCategory> CategoryStore::register(int id, const std::string& name)
+std::shared_ptr<ItemCategory> CategoryStore::create(int id, const std::string& name)
 {
   if (this->_categories.find(id) == this->_categories.end())
-    this->_categories.insert(std::make_pair<int, std::shared_ptr<ItemCategory>>(id, std::make_shared<ItemCategory>(id, name)));
+    this->_categories.insert(std::make_pair(id, std::make_shared<ItemCategory>(id, name)));
   return this->_categories[id];
 }
 

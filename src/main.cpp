@@ -7,13 +7,18 @@
 #include "ChatnetBot.hpp"
 #include "CommandSet.hpp"
 #include "Common.hpp"
+#include "Item.hpp"
+#include "ItemDatabase.hpp"
 #include "Player.hpp"
 #include "Zone.hpp"
 
 int main(int argc, char **argv)
 {
   common::program_initialize();
-  auto player = std::make_shared<Player>("UB-Dr Brain", "password");
+  for (auto i : ItemDatabase::getInstance().getItems())
+    std::cout << i << std::endl;
+
+  auto player = std::make_shared<Player>("tetris-", "pw");
   auto bot = std::make_shared<ChatnetBot>(player);
 
   std::unique_ptr<CommandSet> basicCommandSet(new BasicCommandSet("I compute good ship builds using simple rules. PM me !help build.", "nn", bot));
