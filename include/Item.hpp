@@ -12,7 +12,7 @@ class Item;
 struct ItemCategory
 {
   ItemCategory(int id1, const std::string name1) : name(name1), id(id1), max(1) {}
-  std::vector<Item> items;
+  std::vector<std::weak_ptr<Item>> items;
   std::string name;
   int id;
   unsigned int max; // *todo initialize
@@ -21,7 +21,7 @@ struct ItemCategory
 struct ItemInfo
 {
   std::string name;
-  std::shared_ptr<ItemCategory> category;
+  std::vector<std::shared_ptr<ItemCategory>> categories;
   unsigned int money;
   unsigned int exp;
   unsigned int max;
@@ -47,7 +47,7 @@ public:
   std::string getName() const;
   unsigned int getMoney() const;
   unsigned int getExp() const;
-  std::shared_ptr<ItemCategory> getCategory() const;
+  std::vector<std::shared_ptr<ItemCategory>> getCategories() const;
   int getId() const;
 
   unsigned int getShipMask() const;

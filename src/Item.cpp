@@ -16,9 +16,9 @@ unsigned int Item::getExp() const
   return this->_info.exp;
 }
 
-std::shared_ptr<ItemCategory> Item::getCategory() const
+std::vector<std::shared_ptr<ItemCategory>> Item::getCategories() const
 {
-  return this->_info.category;
+  return this->_info.categories;
 }
 
 int Item::getId() const
@@ -47,10 +47,7 @@ ItemInfo& Item::getInfo()
 }
 
 std::ostream& operator<<(std::ostream& out, const Item& item)
-{
-  if (item.getCategory() != nullptr)
-    out << "<<" << item.getName() << " : " << item.getMoney() << " " << item.getExp() << " : " << item.getCategory()->name << ">>";
-  else
-    out << "<<" << item.getName() << " : " << item.getMoney() << " " << item.getExp() << " : NULL>>";
+{  
+  out << "<<" << item.getName() << " : " << item.getMoney() << " " << item.getExp() << " : " << ">>";  
   return out;
 }

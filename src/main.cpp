@@ -9,6 +9,7 @@
 #include "Common.hpp"
 #include "Item.hpp"
 #include "ItemDatabase.hpp"
+#include "ItemHeap.hpp"
 #include "Player.hpp"
 #include "Zone.hpp"
 
@@ -16,12 +17,15 @@ int main(int argc, char **argv)
 {
   common::program_initialize();
   for (auto i : ItemDatabase::getInstance().getItems())
-    std::cout << i << std::endl;
+    std::cout << *i << std::endl;
+  std::cout << std::endl;
+  ItemHeap::Builder builder(ItemHeap::getDefaultCostFunction());
+  builder.build(7);
 
-  auto player = std::make_shared<Player>("tetris-", "pw");
+  auto player = std::make_shared<Player>("tetris-", "password");
   auto bot = std::make_shared<ChatnetBot>(player);
 
-  std::unique_ptr<CommandSet> basicCommandSet(new BasicCommandSet("I compute good ship builds using simple rules. PM me !help build.", "nn", bot));
+  std::unique_ptr<CommandSet> basicCommandSet(new BasicCommandSet("Work-in-progress: I compute good ship builds using simple rules. !help build", "nn", bot));
   bot->addCommandSet(std::move(basicCommandSet));
 
   if (!bot->connect(Zone("Hyperspace", "142.4.200.80", "5005")))

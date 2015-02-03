@@ -12,6 +12,7 @@ public:
   static CategoryStore& getInstance();
   std::shared_ptr<ItemCategory> create(int id, const std::string& name);
   std::shared_ptr<ItemCategory> get(int id);
+  std::unordered_map<int, std::shared_ptr<ItemCategory>>& getMap();
 private:
   CategoryStore() {}
   std::unordered_map<int, std::shared_ptr<ItemCategory>> _categories;

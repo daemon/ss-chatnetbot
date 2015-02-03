@@ -9,7 +9,8 @@
 #include "Item.hpp"
 #include "ItemDatabase.hpp"
 
-static const std::vector<std::string> _shouldMinimize {"bombenergy",
+static const std::vector<std::string> _shouldMinimize {
+  "bombenergy",
   "mineenergypct",
   "cloakenergy",
   "bulletdelaypct",
@@ -30,7 +31,15 @@ static const std::vector<std::string> _shouldMinimize {"bombenergy",
   "mineenergy",
   "bombdamage",
   "bombdelay",
-  "bombenergypct" };
+  "bombenergypct", /* */
+  "bulletdamageup",
+  "ebombdamage",
+  "ebombtime",
+  "burstdamage",
+  "inactshrapdamage",
+  "bulletenergy",
+  "bulletdelay",
+  "multidelay" };
 
 ItemDatabase& ItemDatabase::getInstance()
 {
@@ -38,12 +47,13 @@ ItemDatabase& ItemDatabase::getInstance()
   return s;
 }
 
-std::vector<Item>& ItemDatabase::getItems()
+std::vector<std::shared_ptr<Item>>& ItemDatabase::getItems()
 {
-  sqlite3* handle;
-  sqlite3_open("hs_items.db", &handle);
   if (this->_loaded)
     return this->_items;
+
+  sqlite3* handle;
+  sqlite3_open("hs_items.db", &handle);
 
   std::string statement = "SELECT * FROM items WHERE 1=1";
   sqlite3_stmt* stmtObj;
@@ -276,17 +286,19 @@ std::vector<Item>& ItemDatabase::getItems()
     })).second;
 
   for (auto& i : itemInfos)
-    this->_items.push_back(Item(i, itemIdToStats[i.id]));
+    this->_items.push_back(std::make_shared<Item>(i, itemIdToStats[i.id]));
   
   for (auto& i : idToCategoryIds)
   {
     auto cat = CategoryStore::getInstance().get(i.second);
-    auto it = std::find_if(this->_items.begin(), this->_items.end(), [&i](const Item& item) {
-      return item.getId() == i.first;
+    auto it = std::find_if(this->_items.begin(), this->_items.end(), [&i](std::shared_ptr<Item> item) {
+      return item->getId() == i.first;
     });
-    it->getInfo().category = cat;
+    it->get()->getInfo().categories.push_back(cat);
+    cat->items.push_back(*it);
   }
 
+  sqlite3_close(handle);
   this->_loaded = true;
   return this->_items;
 }

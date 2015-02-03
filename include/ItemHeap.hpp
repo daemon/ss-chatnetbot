@@ -2,50 +2,65 @@
 #define __ITEM_HEAP__
 
 #include <functional>
+#include <iostream>
 #include <memory>
 #include <vector>
 
 class Item; // Item.hpp
 class ItemCategory; // Item.hpp
 
-typedef std::function<int(Item)> CostFunctionT;
+typedef std::function<int(Item&)> CostFunctionT;
 
 struct ItemNode
 {
-  std::unique_ptr<ItemNode> root;
-  std::unique_ptr<ItemNode> left;
-  std::unique_ptr<ItemNode> right;
+  std::weak_ptr<ItemNode> root;
+  std::shared_ptr<ItemNode> left;
+  std::shared_ptr<ItemNode> right;
+  std::shared_ptr<Item> item;
+  int cost;
 };
 
 struct ItemCategoryNode
 {
   std::shared_ptr<ItemCategory> category;
-  std::unique_ptr<ItemNode> root;
-  size_t height;
+  std::vector<std::shared_ptr<ItemNode>> heap;
 };
 
 class ItemHeap
 {
-  friend class ItemHeap::Builder;
+  friend class Builder;
+  friend std::ostream& operator<<(std::ostream& out, const ItemHeap& heap);
 public:
-  ItemHeap(const ItemHeap&) = delete;
-  ItemHeap& operator=(const ItemHeap&) = delete;
-  ItemHeap(ItemHeap&& other);
-  ItemHeap& operator=(ItemHeap&&);
+  std::vector<ItemCategoryNode>& getCategoryNodes() { return this->_categoryNodes; }
+  void insert(std::vector<ItemCategoryNode>::iterator it, std::shared_ptr<ItemNode> item);
 
-  std::vector<ItemCategoryNode>& getCategoryNodes();
-  
+  static CostFunctionT getDefaultCostFunction();
+
   class Builder
   {
   public:
-    Builder(std::vector<std::shared_ptr<ItemCategory>> categories, CostFunctionT costFn);
-    ItemHeap build(unsigned int ship);
+    Builder(/*std::vector<std::shared_ptr<ItemCategory>> categories,*/ CostFunctionT costFn);
+    ItemHeap build(unsigned int ship); // TODO: user-defined constraints function
   private:
-    std::vector<std::shared_ptr<ItemCategory>> _categories;
     CostFunctionT _costFn;
   };
 private:
   std::vector<ItemCategoryNode> _categoryNodes;
-};
+};/*
+static inline std::ostream& operator<<(std::ostream& out, ItemNode* node)
+{
+  if (node == nullptr)
+    return out;
+  
+  if (node->left)
+    out << node->left.get();
+  
+  out << *node->item;
+
+  if (node->right)
+    out << node->right.get();
+  
+  return out;
+}*/
 
 #endif

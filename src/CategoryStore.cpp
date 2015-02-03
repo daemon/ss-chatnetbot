@@ -21,3 +21,8 @@ std::shared_ptr<ItemCategory> CategoryStore::get(int id)
     return nullptr;
   return this->_categories[id];
 }
+
+std::unordered_map<int, std::shared_ptr<ItemCategory>>& CategoryStore::getMap()
+{
+  return this->_categories;
+}
